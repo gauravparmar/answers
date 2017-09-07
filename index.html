@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang='en'>
+<head>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+</head>
+<body>
+  <div class='add-question'>
+    <input
+      class='add-question__input'
+      type='text'
+      placeholder='Add question'
+    />
+  </div>
+  <div class='questions'></div>
+  <div class='active-question'>
+    <div class='active-question__text'></div>
+    <input
+      class='active-question__new-answer'
+      type='text'
+      placeholder='Add new answer'
+    />
+    <div class='active-question__answers'></div>
+  </div>
+
+  <script type='text/javascript'>
+    var $addQuestionInput = document.querySelector('.add-question__input');
+    var $addAnswerInput = document.querySelector('.active-question__new-answer');
+    var storedQuestions = localStorage.getItem('questions');
+    var questions = storedQuestions ? JSON.parse(storedQuestions) : [];
+    var activeQuestion;
+
+    $addQuestionInput.addEventListener('keypress', function(e) {
+      if ((e.keyCode || e.which) === 13) {
+        addQuestion(e.target.value);
+        e.target.value = '';
+        renderQuestions(questions);
+      }
+    });
+    $addAnswerInput.addEventListener('keypress', function(e) {
+      if (((e.keyCode || e.which) === 13) && activeQuestion) {
+        addAnswer(activeQuestion, e.target.value);
+        e.target.value = '';
+        activateQuestion(activeQuestion);
+      }
+    });
+
+    function addQuestion(question) {
+      questions = questions.concat([{
+        text: question,
+        answers: [],
+        created_at: new Date(),
+      }]);
+      saveQuestions(questions);
+    }
+
+    function saveQuestions(questions) {
+      localStorage.setItem('questions', JSON.stringify(questions));
+    }
+
+    function renderQuestions(questions) {
+      var $questionsContainer = document.querySelector('.questions');
+      $questionsContainer.innerHTML = '';
+
+      questions.forEach(function(question) {
+        var questionElement = document.createElement('div');
+        questionElement.classList.add('question');
+        questionElement.textContent = question.text;
+        questionElement = $questionsContainer.appendChild(questionElement);
+        questionElement.addEventListener('click', function() {
+          activateQuestion(question);
+        });
+      });
+    }
+
+    function activateQuestion(question) {
+      var $activeQuestionText = document.querySelector('.active-question__text');
+      var $activeQuestionAnswers = document.querySelector('.active-question__answers');
+
+      $activeQuestionText.textContent = question.text;
+      $activeQuestionAnswers.innerHTML = '';
+      question.answers.forEach(function(answer) {
+        var answerElement = document.createElement('div');
+        answerElement.classList.add('answer');
+        answerElement.textContent = answer.text + ` - (${answer.count})`;
+        answerElement = $activeQuestionAnswers.appendChild(answerElement);
+        answerElement.addEventListener('click', function() {
+          answer.count += 1;
+          saveQuestions(questions);
+          activateQuestion(activeQuestion);
+        });
+      });
+
+      activeQuestion = question;
+    }
+
+
+    function addAnswer(question, answer) {
+      question.answers = question.answers.concat([{
+        text: answer,
+        count: 1,
+      }]);
+      saveQuestions(questions);
+    }
+
+    window.onload = function() {
+      renderQuestions(questions);
+    }
+  </script>
+</body>
