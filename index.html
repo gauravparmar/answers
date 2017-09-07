@@ -3,6 +3,41 @@
 <head>
   <meta charset='utf-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <style type="text/css">
+    html, body {
+      height: 100%;
+      font-size: 20px;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 10px;
+    }
+    *, *::before, *::after { box-sizing: inherit; }
+
+    input {
+      display: block;
+      height: 44px;
+      line-height: 44px;
+      max-width: 100%;
+      width: 400px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      padding: 0 12px;
+    }
+
+    .questions, .active-question {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f5f5f5;
+    }
+
+    .question, .answer {
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div class='add-question'>
@@ -12,7 +47,7 @@
       placeholder='Add question'
     />
   </div>
-  <div class='questions'></div>
+  <ul class='questions'></ul>
   <div class='active-question'>
     <div class='active-question__text'></div>
     <input
@@ -20,7 +55,7 @@
       type='text'
       placeholder='Add new answer'
     />
-    <div class='active-question__answers'></div>
+    <ul class='active-question__answers'></ul>
   </div>
 
   <script type='text/javascript'>
@@ -63,7 +98,7 @@
       $questionsContainer.innerHTML = '';
 
       questions.forEach(function(question) {
-        var questionElement = document.createElement('div');
+        var questionElement = document.createElement('li');
         questionElement.classList.add('question');
         questionElement.textContent = question.text;
         questionElement = $questionsContainer.appendChild(questionElement);
@@ -80,7 +115,7 @@
       $activeQuestionText.textContent = question.text;
       $activeQuestionAnswers.innerHTML = '';
       question.answers.forEach(function(answer) {
-        var answerElement = document.createElement('div');
+        var answerElement = document.createElement('li');
         answerElement.classList.add('answer');
         answerElement.textContent = answer.text + ` - (${answer.count})`;
         answerElement = $activeQuestionAnswers.appendChild(answerElement);
